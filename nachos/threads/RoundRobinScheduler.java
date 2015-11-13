@@ -31,6 +31,8 @@ public class RoundRobinScheduler extends Scheduler {
 	}
 
 	private class FifoQueue extends ThreadQueue {
+		
+		private LinkedList<KThread> waitQueue = new LinkedList<KThread>();
 		/**
 		 * Add a thread to the end of the wait queue.
 		 *
@@ -78,7 +80,5 @@ public class RoundRobinScheduler extends Scheduler {
 			for (Iterator i = waitQueue.iterator(); i.hasNext();)
 				System.out.print((KThread) i.next() + " ");
 		}
-
-		private LinkedList<KThread> waitQueue = new LinkedList<KThread>();
 	}
 }

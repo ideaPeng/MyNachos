@@ -433,6 +433,7 @@ public class KThread {
 		//joinTest();
 		//conditionTest();
 		//alarmTest();
+		communicatorTest();
 	}
 	
 	public static void joinTest(){
@@ -510,6 +511,42 @@ public class KThread {
 		}).setName("AlarmTestThread2").fork();
 		
 		System.out.println("----------Alarm Waked----------");
+	}
+	
+	public static void communicatorTest(){
+		System.out.println("----------Communitor Test----------");
+		final Communicator communicator = new Communicator();
+		
+		new KThread(new Runnable() {
+			@Override
+			public void run() {
+				communicator.speak(10);
+				System.out.println("Speaker1 said 10");
+			}
+		}).fork();
+		
+		new KThread(new Runnable() {
+			@Override
+			public void run() {
+				communicator.speak(20);
+				System.out.println("Speaker2 said 20");
+			}
+		}).fork();
+		
+		new KThread(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("Listener1 listened :" + communicator.listen());
+				//System.out.println("Listener1 listened :" + communicator.listen());
+			}
+		}).fork();
+		
+		new KThread(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("Listener2 listened :" + communicator.listen());
+			}
+		}).fork();
 	}
 	private static final char dbgThread = 't';
 
