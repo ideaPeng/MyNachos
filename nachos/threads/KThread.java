@@ -195,12 +195,12 @@ public class KThread {
 	public static void finish() {
 		Lib.debug(dbgThread, "Finishing thread: " + currentThread.toString());
 		
-		Machine.interrupt().disable();//¹ØÖĞ¶Ï
-		Machine.autoGrader().finishingCurrentThread();//½«TCB±ä³É½«Òª½áÊøµÄTCB
+		Machine.interrupt().disable();//ï¿½ï¿½ï¿½Ğ¶ï¿½
+		Machine.autoGrader().finishingCurrentThread();//ï¿½ï¿½TCBï¿½ï¿½É½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½TCB
 		
 		Lib.assertTrue(toBeDestroyed == null);
 		
-		toBeDestroyed = currentThread;//½«µ±Ç°Ïß³Ì±ä³É½«Òª½áÊøµÄÏß³Ì£¬ÏÂÒ»¸öÏß³ÌÔËĞĞµÄÊ±ºò×Ô¶¯½áÊøËü
+		toBeDestroyed = currentThread;//ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ß³Ì±ï¿½É½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì£ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½Ğµï¿½Ê±ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		currentThread.status = statusFinished;
 		
 		KThread thread = currentThread().waitQueue.nextThread();
@@ -208,7 +208,7 @@ public class KThread {
 			thread.ready();
 		}
 
-		sleep();//ÉèÖÃµ±Ç°Ïß³ÌÎª×èÈûÌ¬£¬¶ÁÈ¡ÏÂÒ»¸ö¾ÍĞ÷Ïß³Ì
+		sleep();//ï¿½ï¿½ï¿½Ãµï¿½Ç°ï¿½ß³ï¿½Îªï¿½ï¿½ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½
 	}
 
 	/**
@@ -431,20 +431,21 @@ public class KThread {
 //		new PingTest(0).run();
 		
 		//joinTest();
-		conditionTest();
+		//conditionTest();
+		//alarmTest();
 	}
 	
 	public static void joinTest(){
 		System.out.println("-------------JoinTest-------------");
 		
-		//ÕâÀï¿¼ÂÇÒ»¸öÎÊÌâ£¬PingTestÖĞÓĞÒ»¾äcurrentThread.yield();ÊÇÊ²Ã´ÒâË¼
+		//è€ƒè™‘ä¸‹é¢çš„é—®é¢˜ï¼ŒPingTestç±»ä¸­æœ‰ä¸€å¥currentThread.yield();æ˜¯ä»€ä¹ˆæ„æ€Ë¼
 		KThread threadA = new KThread(new PingTest(1));
 		threadA.fork();
 		KThread threadB = new KThread(new Runnable() {
 			public void run() {
 				System.out.println("Thread B begins running!");
 				threadA.join();
-				//¿¼ÂÇÕâ¾ä»°ÊÇ¸öÊ²Ã´ÎÊÌâ
+				//è€ƒè™‘ä¸‹é¢è¿™ä¸ªé—®é¢˜ï¼Œä¸ºä»€ä¹ˆè¦è®©currentThread yield
 				currentThread.yield();
 				System.out.println("Thread B is OVER!");
 			}
@@ -488,6 +489,28 @@ public class KThread {
 		kt2.fork();
 	}
 
+	public static void alarmTest(){
+		System.out.println("----------Alarm Start----------");
+		new KThread(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println(" ç¡çœ å‰ç³»ç»Ÿæ—¶é—´ï¼š"+Machine.timer().getTime()+"\n1çº¿ç¨‹å¼€å§‹ç¡çœ ï¼Œæ—¶é—´500");
+			    new Alarm().waitUntil(1000);
+				System.out.println("1é†’æ¥åç³»ç»Ÿæ—¶é—´ï¼š"+Machine.timer().getTime());
+			}
+		}).setName("AlarmTestThread1").fork();
+		
+		new KThread(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println(" ç¡çœ å‰ç³»ç»Ÿæ—¶é—´ï¼š"+Machine.timer().getTime()+"\n2çº¿ç¨‹å¼€å§‹ç¡çœ ï¼Œæ—¶é—´500");
+			    new Alarm().waitUntil(1000);
+				System.out.println("2é†’æ¥åç³»ç»Ÿæ—¶é—´ï¼š"+Machine.timer().getTime());
+			}
+		}).setName("AlarmTestThread2").fork();
+		
+		System.out.println("----------Alarm Waked----------");
+	}
 	private static final char dbgThread = 't';
 
 	/**
@@ -522,9 +545,9 @@ public class KThread {
 	/** Number of times the KThread constructor was called. */
 	private static int numCreated = 0;
 
-	private static ThreadQueue readyQueue = null;// ¾ÍĞ÷¶ÓÁĞ
-	//´Ë´¦¿¼ÂÇÒ»¸öÎÊÌâ£¬waitQueue µ½µ×Òª²»ÒªÓÃstatic
-	private static ThreadQueue waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);// µÈ´ı¶ÓÁĞ
+	private static ThreadQueue readyQueue = null;
+	//è€ƒè™‘ä¸‹é¢çš„è¿™ä¸ªwaitQueue æ˜¯å¦æ˜¯è¦ä½¿ç”¨static
+	private static ThreadQueue waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);// ï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½
 	private static KThread currentThread = null;
 	private static KThread toBeDestroyed = null;
 	private static KThread idleThread = null;
