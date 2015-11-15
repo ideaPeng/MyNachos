@@ -87,6 +87,7 @@ public class Communicator {
 		}
 		lock.release();
 		Machine.interrupt().restore(status);
+		
 		return wordQueue.poll();
 	}
 }

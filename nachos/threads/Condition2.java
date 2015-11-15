@@ -56,7 +56,9 @@ public class Condition2 {
 		Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
 		boolean status = Machine.interrupt().disable();
+		
 		KThread thread = waitQueue.nextThread();
+		
 		if (thread != null) {
 			thread.ready();// 只是单纯的放到等待队列哦，不是立刻执行哦
 		}
