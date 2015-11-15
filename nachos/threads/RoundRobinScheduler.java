@@ -41,7 +41,6 @@ public class RoundRobinScheduler extends Scheduler {
 		 */
 		public void waitForAccess(KThread thread) {
 			Lib.assertTrue(Machine.interrupt().disabled());
-
 			waitQueue.add(thread);
 		}
 
@@ -67,7 +66,6 @@ public class RoundRobinScheduler extends Scheduler {
 		 */
 		public void acquire(KThread thread) {
 			Lib.assertTrue(Machine.interrupt().disabled());
-
 			Lib.assertTrue(waitQueue.isEmpty());
 		}
 

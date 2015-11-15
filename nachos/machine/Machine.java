@@ -12,6 +12,30 @@ import java.io.File;
  * constructs all simulated hardware devices, and starts the grader.
  */
 public final class Machine {
+
+	private static int numPhysPages = -1;
+	private static long randomSeed = 0;
+	
+	private static String autoGraderClassName = "nachos.ag.AutoGrader";
+	private static String shellProgramName = null;
+	private static String processClassName = null;
+	private static String configFileName = "nachos.conf";
+	private static String[] args = null;
+	
+	private static Interrupt interrupt = null;
+	private static Timer timer = null;
+	private static ElevatorBank bank = null;
+	private static Processor processor = null;
+	private static SerialConsole console = null;
+	private static FileSystem stubFileSystem = null;
+	private static NetworkLink networkLink = null;
+	private static AutoGrader autoGrader = null;
+	private static NachosSecurityManager securityManager;
+	private static Privilege privilege;
+	private static Stats stats = new Stats();
+	private static File baseDirectory, nachosDirectory, testDirectory;
+	
+	
 	/**
 	 * Nachos main entry point.
 	 *
@@ -19,12 +43,11 @@ public final class Machine {
 	 *            the command line arguments.
 	 */
 	public static void main(final String[] args) {
-		System.out.print("nachos 5.0j initializing...");
+		System.out.print("STEP1--> nachos 5.0j initializing...(In Machine.java)\n");
 		Lib.assertTrue(Machine.args == null);
+		
 		Machine.args = args;
-
 		processArgs();
-
 		Config.load(configFileName);
 
 		// get the current directory (.)
@@ -33,6 +56,7 @@ public final class Machine {
 		nachosDirectory = new File(baseDirectory, "nachos");
 
 		String testDirectoryName = Config.getString("FileSystem.testDirectory");
+		//System.out.println(testDirectoryName);   --> null
 
 		// get the test directory
 		if (testDirectoryName != null) {
@@ -43,17 +67,17 @@ public final class Machine {
 		}
 
 		securityManager = new NachosSecurityManager(testDirectory);
+		
 		privilege = securityManager.getPrivilege();
-
 		privilege.machine = new MachinePrivilege();
 
 		TCB.givePrivilege(privilege);
 		privilege.stats = stats;
 
 		securityManager.enable();
+		
 		createDevices();
 		checkUserClasses();
-
 		autoGrader = (AutoGrader) Lib.constructObject(autoGraderClassName);
 
 		new TCB().start(new Runnable() {
@@ -183,7 +207,7 @@ public final class Machine {
 	}
 
 	private static void checkUserClasses() {
-		System.out.print(" user-check");
+		System.out.print("STEP5--> user-check...(In Machine.java)\n");
 
 		Class aclsInt = (new int[0]).getClass();
 		Class clsObject = Lib.loadClass("java.lang.Object");
@@ -345,17 +369,6 @@ public final class Machine {
 		return autoGrader;
 	}
 
-	private static Interrupt interrupt = null;
-	private static Timer timer = null;
-	private static ElevatorBank bank = null;
-	private static Processor processor = null;
-	private static SerialConsole console = null;
-	private static FileSystem stubFileSystem = null;
-	private static NetworkLink networkLink = null;
-	private static AutoGrader autoGrader = null;
-
-	private static String autoGraderClassName = "nachos.ag.AutoGrader";
-
 	/**
 	 * Return the name of the shell program that a user-programming kernel must
 	 * run. Make sure <tt>UserKernel.run()</tt> <i>always</i> uses this method
@@ -370,8 +383,6 @@ public final class Machine {
 		Lib.assertTrue(shellProgramName != null);
 		return shellProgramName;
 	}
-
-	private static String shellProgramName = null;
 
 	/**
 	 * Return the name of the process class that the kernel should use. In the
@@ -393,21 +404,6 @@ public final class Machine {
 		Lib.assertTrue(processClassName != null);
 		return processClassName;
 	}
-
-	private static String processClassName = null;
-
-	private static NachosSecurityManager securityManager;
-	private static Privilege privilege;
-
-	private static String[] args = null;
-
-	private static Stats stats = new Stats();
-
-	private static int numPhysPages = -1;
-	private static long randomSeed = 0;
-
-	private static File baseDirectory, nachosDirectory, testDirectory;
-	private static String configFileName = "nachos.conf";
 
 	private static final String help = "\n" + "Options:\n" + "\n" + "\t-d <debug flags>\n"
 			+ "\t\tEnable some debug flags, e.g. -d ti\n" + "\n" + "\t-h\n" + "\t\tPrint this help message.\n" + "\n"

@@ -56,7 +56,6 @@ public final class TCB {
 	 * first TCB is created, this vector is basically never empty.
 	 */
 	private static Vector<TCB> runningThreads = new Vector<TCB>();
-
 	private static Privilege privilege;
 	private static KThread toBeDestroyed = null;
 
@@ -92,11 +91,11 @@ public final class TCB {
 	 * will know that the current TCB is doomed.
 	 */
 	private boolean done = false;
+	private boolean associated = false;
 
 	private KThread nachosThread = null;
-	private boolean associated = false;
-	private Runnable target;
-	private Runnable tcbTarget;//传给底层javaThread对象的
+	private Runnable target;//exactly the runnable target 
+	private Runnable tcbTarget;//used by javaThread
 
 	/**
 	 * Allocate a new TCB.
@@ -163,7 +162,7 @@ public final class TCB {
 		 */
 		runningThreads.add(this);
 
-		this.target = target;
+		this.target = target;//the target runnable object
 
 		if (!isFirstTCB) {
 			/*
@@ -262,8 +261,8 @@ public final class TCB {
 
 		// ensure AutoGrader.finishingCurrentThread() called authorizeDestroy()
 		Lib.assertTrue(nachosThread == toBeDestroyed);
+		
 		toBeDestroyed = null;
-
 		this.done = true;
 		currentTCB.running = false;
 

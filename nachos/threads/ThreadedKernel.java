@@ -6,6 +6,23 @@ import nachos.machine.*;
  * A multi-threaded OS kernel.
  */
 public class ThreadedKernel extends Kernel {
+	
+	/** Globally accessible reference to the scheduler. */
+	public static Scheduler scheduler = null;
+	/** Globally accessible reference to the alarm. */
+	public static Alarm alarm = null;
+	/** Globally accessible reference to the file system. */
+	public static FileSystem fileSystem = null;
+
+	// dummy variables to make javac smarter
+	private static RoundRobinScheduler dummy1 = null;
+	private static PriorityScheduler dummy2 = null;
+	private static LotteryScheduler dummy3 = null;
+	private static Condition2 dummy4 = null;
+	private static Communicator dummy5 = null;
+	private static Rider dummy6 = null;
+	private static ElevatorController dummy7 = null;
+	
 	/**
 	 * Allocate a new multi-threaded kernel.
 	 */
@@ -24,6 +41,7 @@ public class ThreadedKernel extends Kernel {
 
 		// set fileSystem
 		String fileSystemName = Config.getString("ThreadedKernel.fileSystem");
+		//System.out.println(fileSystemName); -->null
 		if (fileSystemName != null)
 			fileSystem = (FileSystem) Lib.constructObject(fileSystemName);
 		else if (Machine.stubFileSystem() != null)
@@ -32,8 +50,9 @@ public class ThreadedKernel extends Kernel {
 			fileSystem = null;
 
 		// start threading
-		new KThread(null);
-
+		new KThread(null);//The first KThread,in other way,the "main" KThread
+		
+		// alocate a new Alarm
 		alarm = new Alarm();
 
 		Machine.interrupt().enable();
@@ -67,20 +86,4 @@ public class ThreadedKernel extends Kernel {
 	public void terminate() {
 		Machine.halt();
 	}
-
-	/** Globally accessible reference to the scheduler. */
-	public static Scheduler scheduler = null;
-	/** Globally accessible reference to the alarm. */
-	public static Alarm alarm = null;
-	/** Globally accessible reference to the file system. */
-	public static FileSystem fileSystem = null;
-
-	// dummy variables to make javac smarter
-	private static RoundRobinScheduler dummy1 = null;
-	private static PriorityScheduler dummy2 = null;
-	private static LotteryScheduler dummy3 = null;
-	private static Condition2 dummy4 = null;
-	private static Communicator dummy5 = null;
-	private static Rider dummy6 = null;
-	private static ElevatorController dummy7 = null;
 }

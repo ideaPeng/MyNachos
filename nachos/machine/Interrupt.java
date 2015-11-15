@@ -47,7 +47,7 @@ public final class Interrupt {
      *				machine.
      */
     public Interrupt(Privilege privilege) {
-	System.out.print(" interrupt");
+	System.out.print("STEP3--> Initializing the interrupt...(In Interrupt.java)\n");
 	
 	this.privilege = privilege;
 	privilege.interrupt = new InterruptPrivilege();

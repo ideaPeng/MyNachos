@@ -4,28 +4,30 @@ import nachos.machine.*;
 
 public class KThread {
 
-	private int join_counter = 0;
-	private int status = statusNew;
-	private String name = "(unnamed thread)";
-	private Runnable target;
-	private TCB tcb;
-	private int id = numCreated++;
-	private static int numCreated = 0;// 标识从0开始
-
 	private static final int statusNew = 0;
 	private static final int statusReady = 1;
 	private static final int statusRunning = 2;
 	private static final int statusBlocked = 3;
 	private static final int statusFinished = 4;
+	private static final char dbgThread = 't';
+	
+	private static int numCreated = 0;// 标识从0开始
+	private int id = numCreated++;
+	private int join_counter = 0;
+	private int status = statusNew;
+	
+	private String name = "(unnamed thread)";
+	private Runnable target;
+	private TCB tcb;
 
-	private static ThreadQueue readyQueue = null;// 就绪队列
+
+	private static ThreadQueue readyQueue = null;
 	private static ThreadQueue waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
 	
 	private static KThread currentThread = null;
 	private static KThread toBeDestroyed = null;
 	private static KThread idleThread = null;
 
-	private static final char dbgThread = 't';
 
 	/**
 	 * Additional state used by schedulers.
@@ -35,7 +37,7 @@ public class KThread {
 	public Object schedulingState = null;
 
 	public KThread(Runnable target) {
-		this();// 调用无参数的构造器
+		this();
 		this.target = target;
 	}
 
@@ -54,6 +56,7 @@ public class KThread {
 			createIdleThread();
 		}
 		waitQueue.acquire(this);
+		
 		Machine.interrupt().restore(status);
 	}
 
@@ -84,15 +87,19 @@ public class KThread {
 	private void begin() {
 		Lib.debug(dbgThread, "Beginning thread: " + toString());
 		Lib.assertTrue(this == currentThread);
+		
 		restoreState();
+		
 		Machine.interrupt().enable();// 开中断
 	}
 
 	public static void finish() {
 		Lib.debug(dbgThread, "Finishing thread: " + currentThread.toString());
-		Machine.interrupt().disable();// 关中断
+		
+		Machine.interrupt().disable();
 		Machine.autoGrader().finishingCurrentThread();// 将TCB变成将要结束的TCB
 		Lib.assertTrue(toBeDestroyed == null);
+		
 		toBeDestroyed = currentThread;// 将当前线程变为将要结束的线程，下一个线程运行的时候自动消除它
 		currentThread.status = statusFinished;// 当前线程状态置为完成
 
@@ -104,7 +111,8 @@ public class KThread {
 		sleep();// 将当前线程置为完成态，读取下一个就绪线程
 	}
 
-	public static void sleep() {// 如果线程执行完，则是从finish来，否则线程锁死，读取下一个线程
+	public static void sleep() {
+		// 如果线程执行完，则是从finish来，否则线程锁死，读取下一个线程
 		Lib.debug(dbgThread, "Sleeping thread: " + currentThread.toString());
 		Lib.assertTrue(Machine.interrupt().disabled());
 		if (currentThread.status != statusFinished)
@@ -114,16 +122,20 @@ public class KThread {
 
 	private static void runNextThread() {// 执行下一个线程
 		KThread nextThread = readyQueue.nextThread();
+		
 		if (nextThread == null)
 			nextThread = idleThread;// 如果线程队列为空则执行idle线程
+		
 		nextThread.run();
 	}
 
 	private void run() {
 		Lib.assertTrue(Machine.interrupt().disabled());
+		
 		Machine.yield();// 当前java线程放弃CPU
 		currentThread.saveState();// 无实际操作
 		Lib.debug(dbgThread, "Switching from: " + currentThread.toString() + " to: " + toString());
+		
 		currentThread = this;
 		tcb.contextSwitch();
 		currentThread.restoreState();
@@ -133,9 +145,12 @@ public class KThread {
 	public static void yield() {// 运行线程放弃cpu，将当前线程放入就绪队列，读取就绪队列下一个线程运行
 		Lib.debug(dbgThread, "Yielding thread: " + currentThread.toString());
 		Lib.assertTrue(currentThread.status == statusRunning);
+		
 		boolean intStatus = Machine.interrupt().disable();
+		
 		currentThread.ready();// 正在执行的线程放入就绪队列，执行就绪队列的下一个线程
 		runNextThread();// 运行下一个线程
+		
 		Machine.interrupt().restore(intStatus);
 	}
 
@@ -153,8 +168,11 @@ public class KThread {
 		Machine.autoGrader().readyThread(this);// 空方法
 	}
 
-	private static void createIdleThread() {// 创建idle线程
+	private static void createIdleThread() {
+		//the idleThread is used to yield() all the time,
+		//and make sure thar the readyQueue always has a KThread
 		Lib.assertTrue(idleThread == null);
+		
 		idleThread = new KThread(new Runnable() {
 			public void run() {
 				while (true)
@@ -166,11 +184,13 @@ public class KThread {
 		idleThread.fork();
 	}
 
-	protected void restoreState() {// 恢复状态，执行此线程，如果有要结束的线程就结束它
+	protected void restoreState() {
+		// 恢复状态，执行此线程，如果有要结束的线程就结束它
 		Lib.debug(dbgThread, "Running thread: " + currentThread.toString());
 		Lib.assertTrue(Machine.interrupt().disabled());
 		Lib.assertTrue(this == currentThread);
 		Lib.assertTrue(tcb == TCB.currentTCB());
+		
 		Machine.autoGrader().runningThread(this);
 		status = statusRunning;
 		if (toBeDestroyed != null) {
