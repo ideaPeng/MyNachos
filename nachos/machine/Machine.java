@@ -20,7 +20,6 @@ public final class Machine {
 	 */
 	public static void main(final String[] args) {
 		System.out.print("nachos 5.0j initializing...");
-
 		Lib.assertTrue(Machine.args == null);
 		Machine.args = args;
 

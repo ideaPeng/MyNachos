@@ -5,14 +5,13 @@ import nachos.machine.*;
 public class KThread {
 
 	private int join_counter = 0;
-	private int status = statusNew;// 进程状态，一开始均为新的
+	private int status = statusNew;
 	private String name = "(unnamed thread)";
 	private Runnable target;
 	private TCB tcb;
-	private int id = numCreated++;// 每个KThread都有唯一的标识
+	private int id = numCreated++;
 	private static int numCreated = 0;// 标识从0开始
 
-	// 进程状态
 	private static final int statusNew = 0;
 	private static final int statusReady = 1;
 	private static final int statusRunning = 2;
@@ -20,11 +19,10 @@ public class KThread {
 	private static final int statusFinished = 4;
 
 	private static ThreadQueue readyQueue = null;// 就绪队列
-	private ThreadQueue waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+	private static ThreadQueue waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+	
 	private static KThread currentThread = null;
-
 	private static KThread toBeDestroyed = null;
-
 	private static KThread idleThread = null;
 
 	private static final char dbgThread = 't';
@@ -43,11 +41,10 @@ public class KThread {
 
 	public KThread() {
 		boolean status = Machine.interrupt().disable();
+		
 		if (currentThread != null) {
 			tcb = new TCB();
-
 		} else {
-
 			currentThread = this;
 			tcb = TCB.currentTCB();// 第一个线程是主线程，指向第一个TCB
 			name = "main";
