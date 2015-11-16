@@ -30,7 +30,7 @@ public final class Timer {
 	 *            encapsulates privileged access to the Nachos machine.
 	 */
 	public Timer(Privilege privilege) {
-		System.out.print("STEP4--> Initializing the timer...(In Timer.java)\n");
+		System.out.print("STEP--> Initializing the timer...(In Timer.java)\n");
 
 		this.privilege = privilege;
 

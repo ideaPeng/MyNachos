@@ -42,3 +42,5 @@
 /KThread$15.class
 /KThread$16.class
 /KThread$17.class
+/LotteryScheduler$LotteryQueue.class
+/LotteryScheduler$ThreadState.class

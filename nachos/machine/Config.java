@@ -25,7 +25,7 @@ public final class Config {
 	 *            the name of the file containing the configuration to use.
 	 */
 	public static void load(String fileName) {
-		System.out.print("STEP2--> Class Config is configing...(In Config.java)\n");
+		System.out.print("STEP--> Class Config is configing...(In Config.java)\n");
 		Lib.assertTrue(!loaded);
 
 		loaded = true;

@@ -35,7 +35,7 @@ public class AutoGrader {
 
 		extractArguments(args);
 
-		System.out.print("STEP6--> Start the autograder...(In Autograder.java)\n\n");
+		System.out.print("STEP--> Start the autograder...(In Autograder.java)\n\n");
 
 		init();//unused method,do some init action by yourself
 

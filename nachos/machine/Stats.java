@@ -18,7 +18,6 @@ public final class Stats {
 	 * Print out the statistics in this object.
 	 */
 	public void print() {
-		System.out.println("本次Nachos系统运行统计数据如下 :");
 		System.out.println("Ticks: total " + totalTicks + ", kernel " + kernelTicks + ", user " + userTicks);
 		System.out.println("Disk I/O: reads " + numDiskReads + ", writes " + numDiskWrites);
 		System.out.println("Console I/O: reads " + numConsoleReads + ", writes " + numConsoleWrites);

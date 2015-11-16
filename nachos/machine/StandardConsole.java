@@ -17,7 +17,7 @@ public class StandardConsole implements SerialConsole {
      *				machine.
      */
     public StandardConsole(Privilege privilege) {
-	System.out.print(" console");
+	System.out.print("STEP--> Inializing the console...(In StandardConsole.java)\n");
 
 	this.privilege = privilege;
 

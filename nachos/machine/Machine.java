@@ -43,7 +43,7 @@ public final class Machine {
 	 *            the command line arguments.
 	 */
 	public static void main(final String[] args) {
-		System.out.print("STEP1--> nachos 5.0j initializing...(In Machine.java)\n");
+		System.out.print("STEP--> nachos 5.0j initializing...(In Machine.java)\n");
 		Lib.assertTrue(Machine.args == null);
 		
 		Machine.args = args;
@@ -207,7 +207,7 @@ public final class Machine {
 	}
 
 	private static void checkUserClasses() {
-		System.out.print("STEP5--> user-check...(In Machine.java)\n");
+		System.out.print("STEP--> Begining the user-check...(In Machine.java)\n");
 
 		Class aclsInt = (new int[0]).getClass();
 		Class clsObject = Lib.loadClass("java.lang.Object");

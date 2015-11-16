@@ -243,7 +243,7 @@ public class KThread {
 		// selfTest_join();
 		// selfTest_Condition2();
 		// selfTest_Alarm();
-		selfTest_Communicator();
+		//selfTest_Communicator();
 		// selfTest_Boat();
 		// selftest_Scheduler();
 		// selftest_LotteryScheduler();
