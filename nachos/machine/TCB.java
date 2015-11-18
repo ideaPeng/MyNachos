@@ -197,7 +197,7 @@ public final class TCB {
 			 * This is the first TCB, so we don't need to make a new Java thread
 			 * to run it; we just steal the current Java thread.
 			 */
-			javaThread = Thread.currentThread();
+			javaThread = Thread.currentThread();//The java main thread
 
 			/* All we have to do now is invoke threadroot() directly. */
 			threadroot();
@@ -310,7 +310,7 @@ public final class TCB {
 			 * couple things.
 			 */
 
-			currentTCB = this;
+			currentTCB = this;//
 			running = true;
 		}
 

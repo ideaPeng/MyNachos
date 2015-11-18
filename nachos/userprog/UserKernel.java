@@ -25,7 +25,7 @@ public class UserKernel extends ThreadedKernel {
 	 * Allocate a new user kernel.
 	 */
 	public UserKernel() {
-		super();// 什么都没做
+		super();//执行ThreadedKelnel 的无参构造器
 	}
 
 	/**

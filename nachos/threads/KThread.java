@@ -246,7 +246,7 @@ public class KThread {
 		//selfTest_Communicator();
 		// selfTest_Boat();
 		// selftest_Scheduler();
-		// selftest_LotteryScheduler();
+		 selftest_LotteryScheduler();
 	}
 
 	public static void selfTest_join() {// 检测join是否工作正常
@@ -427,7 +427,6 @@ public class KThread {
 	}
 
 	public static void selftest_LotteryScheduler() {
-
 		final KThread thread1 = new KThread(new Runnable() {
 			public void run() {
 				for (int i = 0; i < 3; i++) {
@@ -439,36 +438,30 @@ public class KThread {
 		});
 		KThread thread2 = new KThread(new Runnable() {
 			public void run() {
-
 				for (int i = 0; i < 3; i++) {
 					KThread.currentThread().yield();
 					System.out.println("thread2");
 				}
-
 			}
 		});
 		KThread thread3 = new KThread(new Runnable() {
 			public void run() {
-
 				thread1.join();
-
 				for (int i = 0; i < 3; i++) {
 					KThread.currentThread().yield();
 					System.out.println("thread3");
 				}
 			}
 		});
+		
 		boolean status = Machine.interrupt().disable();
+		
 		ThreadedKernel.scheduler.setPriority(thread1, 1);
 		ThreadedKernel.scheduler.setPriority(thread2, 2);
-		ThreadedKernel.scheduler.setPriority(thread3, 7);
-		thread1.setName("thread111");
-
-		thread2.setName("thread2222");
-
-		thread3.setName("thread33333");
-
+		ThreadedKernel.scheduler.setPriority(thread3, 3);
+		
 		Machine.interrupt().restore(status);
+		
 		thread1.fork();
 		thread2.fork();
 		thread3.fork();

@@ -5,6 +5,15 @@ import java.util.LinkedList;
 
 public class LotteryScheduler extends Scheduler {
 
+	/**
+	 * The default priority for a new thread. Do not change this value.
+	 */
+	public static final int priorityDefault = 1; // 新线程默认优先级
+
+	public static final int priorityMinimum = 0; // 线程最低优先级是0
+
+	public static final int priorityMaximum = 7; // 线程最高优先级是7
+	
 	public LotteryScheduler() {
 	}
 
@@ -63,22 +72,14 @@ public class LotteryScheduler extends Scheduler {
 	}
 
 	/**
-	 * The default priority for a new thread. Do not change this value.
-	 */
-	public static final int priorityDefault = 1; // 新线程默认优先级
-
-	public static final int priorityMinimum = 0; // 线程最低优先级是0
-
-	public static final int priorityMaximum = 7; // 线程最高优先级是7
-
-	/**
 	 * Return the scheduling state of the specified thread.
 	 *
 	 * @param thread
 	 *            the thread whose scheduling state to return.
 	 * @return the scheduling state of the specified thread.
 	 */
-	protected ThreadState getThreadState(KThread thread) {// 得到线程的优先级状态，如果线程优先级未创建则创建为默认优先级
+	protected ThreadState getThreadState(KThread thread) {
+		// 返回一个线程的优先级状态
 		if (thread.schedulingState == null)
 			thread.schedulingState = new ThreadState(thread);
 
@@ -88,10 +89,18 @@ public class LotteryScheduler extends Scheduler {
 	/**
 	 * A <tt>ThreadQueue</tt> that sorts threads by priority.
 	 */
-	protected class LotteryQueue extends ThreadQueue {// 优先级队列类，继承自线程队列
+	protected class LotteryQueue extends ThreadQueue {
 
-		LotteryQueue(boolean transferPriority) {// 自动调用父类无参数构造方法，创建一个线程队列
-
+		/**
+		 * <tt>true</tt> if this queue should transfer priority from waiting
+		 * threads to the owning thread.
+		 */
+		public boolean transferPriority;
+		public LinkedList<ThreadState> waitQueue = new LinkedList<ThreadState>();
+		public ThreadState linkedthread = null;
+		//private int index;
+		
+		LotteryQueue(boolean transferPriority) {
 			this.transferPriority = transferPriority;
 		}
 
@@ -117,12 +126,12 @@ public class LotteryScheduler extends Scheduler {
 			if (waitQueue.isEmpty())
 				return null;
 
-			int alltickets = 0;
+			int alltickets = 0;//彩票总数
 
 			for (int i = 0; i < waitQueue.size(); i++)// 计算队列中所有彩票的总数
 			{
 				ThreadState thread = waitQueue.get(i);
-				alltickets = alltickets + thread.getEffectivePriority();
+				alltickets += thread.getEffectivePriority();
 
 			}
 
@@ -131,15 +140,15 @@ public class LotteryScheduler extends Scheduler {
 			int nowtickets = 0;
 			KThread winThread = null;
 			ThreadState thread = null;
+			
 			for (int i = 0; i < waitQueue.size(); i++)// 得到获胜的线程
 			{
 				thread = waitQueue.get(i);
-				nowtickets = nowtickets + thread.getEffectivePriority();
+				nowtickets += thread.getEffectivePriority();
 				if (nowtickets >= numOfWin) {
 					winThread = thread.thread;
 					break;
 				}
-
 			}
 
 			if (winThread != null)
@@ -155,9 +164,7 @@ public class LotteryScheduler extends Scheduler {
 		 * @return the next thread that <tt>nextThread()</tt> would return.
 		 */
 		protected ThreadState pickNextThread() {
-
 			// implement me (if you want)
-
 			return null;
 		}
 
@@ -165,19 +172,18 @@ public class LotteryScheduler extends Scheduler {
 			Lib.assertTrue(Machine.interrupt().disabled());
 			// implement me (if you want)
 		}
-
-		/**
-		 * <tt>true</tt> if this queue should transfer priority from waiting
-		 * threads to the owning thread.
-		 */
-		public boolean transferPriority;
-		public LinkedList<ThreadState> waitQueue = new LinkedList<ThreadState>();
-		public ThreadState linkedthread = null;
-		//private int index;
 	}
 
 	protected class ThreadState {
 
+		protected KThread thread;// 这个对象关联的线程
+
+		protected int priority;// 关联线程的优先级
+
+		protected int effectivepriority;// 有效优先级
+
+		protected LotteryQueue waitQueue;
+		
 		public ThreadState(KThread thread) {
 			this.thread = thread;
 			setPriority(priorityDefault);
@@ -188,7 +194,8 @@ public class LotteryScheduler extends Scheduler {
 			return priority;
 		}
 
-		public int getEffectivePriority() {// 得到有效优先级
+		public int getEffectivePriority() {
+			// 得到有效优先级
 			// implement me
 
 			effectivepriority = priority;
@@ -209,28 +216,20 @@ public class LotteryScheduler extends Scheduler {
 			// implement me
 		}
 
-		public void waitForAccess(LotteryQueue waitQueue) {// 将此线程状态存入传入的等待队列
+		public void waitForAccess(LotteryQueue waitQueue) {
+			// 将此线程状态存入传入的等待队列
 			// implement me
 			waitQueue.waitQueue.add(this);
 
 			if (waitQueue.linkedthread != null && waitQueue.linkedthread != this) {
 				waitQueue.linkedthread.waitQueue.waitForAccess(this.thread);
 			}
-
 		}
 
-		public void acquire(LotteryQueue waitQueue) {// 相当于一个线程持有的队列锁
+		public void acquire(LotteryQueue waitQueue) {
+			// 相当于一个线程持有的队列锁
 
 			waitQueue.linkedthread = this;
 		}
-
-		protected KThread thread;// 这个对象关联的线程
-
-		protected int priority;// 关联线程的优先级
-
-		protected int effectivepriority;// 有效优先级
-
-		protected LotteryQueue waitQueue;
-
 	}
 }
