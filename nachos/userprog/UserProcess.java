@@ -19,6 +19,45 @@ import java.util.LinkedList;
  */
 public class UserProcess {
 
+	OpenFile openfiles[] = new OpenFile[16];// 进程打开的文件表
+	/** The program being run by this process. */
+	protected Coff coff;// 进程对应的coff
+
+	public int status = 0;// 进程的状态
+	/** This process's page table. */
+	protected TranslationEntry[] pageTable;// 页表
+	/** The number of contiguous pages occupied by the program. */
+	protected int numPages;// 页数
+
+	/** The number of pages in the program's stack. */
+	protected final int stackPages = 8;// 堆栈占得页数
+
+	private int initialPC, initialSP;
+
+	private int argc, argv;
+
+	public UThread thread = null;// 这个进程所对应的实际线程
+
+	private int pid = 0;// 进程号
+
+	public boolean normalExit = false;// 退出状态，是否为正常退出
+
+	public LinkedList<UserProcess> childProcess = new LinkedList();// 所创建的子进程链表
+
+	public UserProcess parentProcess = null;// 创建这个进程的父进程
+
+	private static int numOfProcess = 0;// 进程计数器
+
+	private static int numOfRunningProcess = 0;// 运行进程计数器
+
+	private static final int pageSize = Processor.pageSize;// 页大小
+
+	private Lock joinLock = new Lock();// 进程join方法等待锁
+
+	private Condition joinCondition = new Condition(joinLock);// join方法使用的条件变量
+
+	private static final char dbgProcess = 'a';
+	
 	/*
 	 * Allocate a new process.
 	 */
@@ -738,44 +777,4 @@ public class UserProcess {
 			Lib.assertNotReached("Unexpected exception");
 		}
 	}
-
-	OpenFile openfiles[] = new OpenFile[16];// 进程打开的文件表
-	/** The program being run by this process. */
-	protected Coff coff;// 进程对应的coff
-
-	public int status = 0;// 进程的状态
-	/** This process's page table. */
-	protected TranslationEntry[] pageTable;// 页表
-	/** The number of contiguous pages occupied by the program. */
-	protected int numPages;// 页数
-
-	/** The number of pages in the program's stack. */
-	protected final int stackPages = 8;// 堆栈占得页数
-
-	private int initialPC, initialSP;
-
-	private int argc, argv;
-
-	public UThread thread = null;// 这个进程所对应的实际线程
-
-	private int pid = 0;// 进程号
-
-	public boolean normalExit = false;// 退出状态，是否为正常退出
-
-	public LinkedList<UserProcess> childProcess = new LinkedList();// 所创建的子进程链表
-
-	public UserProcess parentProcess = null;// 创建这个进程的父进程
-
-	private static int numOfProcess = 0;// 进程计数器
-
-	private static int numOfRunningProcess = 0;// 运行进程计数器
-
-	private static final int pageSize = Processor.pageSize;// 页大小
-
-	private Lock joinLock = new Lock();// 进程join方法等待锁
-
-	private Condition joinCondition = new Condition(joinLock);// join方法使用的条件变量
-
-	private static final char dbgProcess = 'a';
-
 }

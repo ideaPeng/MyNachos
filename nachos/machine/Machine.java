@@ -43,6 +43,7 @@ public final class Machine {
 	 *            the command line arguments.
 	 */
 	public static void main(final String[] args) {
+		
 		System.out.print("STEP--> nachos 5.0j initializing...(In Machine.java)\n");
 		Lib.assertTrue(Machine.args == null);
 		
@@ -59,6 +60,7 @@ public final class Machine {
 		//System.out.println(testDirectoryName);   --> null
 
 		// get the test directory
+		//如果不使用自己的测试目录，则默认使用nachos.test目录
 		if (testDirectoryName != null) {
 			testDirectory = new File(testDirectoryName);
 		} else {

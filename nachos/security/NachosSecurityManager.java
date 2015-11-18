@@ -18,6 +18,15 @@ import java.security.PrivilegedActionException;
  * Protects the environment from malicious Nachos code.
  */
 public class NachosSecurityManager extends SecurityManager {
+	
+	private File testDirectory;
+	private boolean fullySecure;
+
+	private Thread privileged = null;
+	private int privilegeCount = 0;
+
+	private static final char dbgSecurity = 'S';
+	
 	/**
 	 * Allocate a new Nachos security manager.
 	 *
@@ -301,12 +310,4 @@ public class NachosSecurityManager extends SecurityManager {
 		if (!isPrivileged())
 			no(perm);
 	}
-
-	private File testDirectory;
-	private boolean fullySecure;
-
-	private Thread privileged = null;
-	private int privilegeCount = 0;
-
-	private static final char dbgSecurity = 'S';
 }
