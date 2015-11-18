@@ -33,6 +33,7 @@ public class UserKernel extends ThreadedKernel {
 	 * processor's exception handler.
 	 */
 	public void initialize(String[] args) {
+		
 		super.initialize(args);// 设置调度程序和文件系统，创建第一个线程(主线程和idel线程)和alarm
 
 		console = new SynchConsole(Machine.console());// 创建控制台
