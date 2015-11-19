@@ -10,24 +10,22 @@ public class KThread {
 	private static final int statusBlocked = 3;
 	private static final int statusFinished = 4;
 	private static final char dbgThread = 't';
-	
+
 	private static int numCreated = 0;// 标识从0开始
 	private int id = numCreated++;
 	private int join_counter = 0;
 	private int status = statusNew;
-	
+
 	private String name = "(unnamed thread)";
 	private Runnable target;
 	private TCB tcb;
 
-
 	private static ThreadQueue readyQueue = null;
 	private static ThreadQueue waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
-	
+
 	private static KThread currentThread = null;
 	private static KThread toBeDestroyed = null;
 	private static KThread idleThread = null;
-
 
 	/**
 	 * Additional state used by schedulers.
@@ -43,7 +41,7 @@ public class KThread {
 
 	public KThread() {
 		boolean status = Machine.interrupt().disable();
-		
+
 		if (currentThread != null) {
 			tcb = new TCB();
 		} else {
@@ -56,7 +54,7 @@ public class KThread {
 			createIdleThread();
 		}
 		waitQueue.acquire(this);
-		
+
 		Machine.interrupt().restore(status);
 	}
 
@@ -87,19 +85,19 @@ public class KThread {
 	private void begin() {
 		Lib.debug(dbgThread, "Beginning thread: " + toString());
 		Lib.assertTrue(this == currentThread);
-		
+
 		restoreState();
-		
+
 		Machine.interrupt().enable();// 开中断
 	}
 
 	public static void finish() {
 		Lib.debug(dbgThread, "Finishing thread: " + currentThread.toString());
-		
+
 		Machine.interrupt().disable();
 		Machine.autoGrader().finishingCurrentThread();// 将TCB变成将要结束的TCB
 		Lib.assertTrue(toBeDestroyed == null);
-		
+
 		toBeDestroyed = currentThread;// 将当前线程变为将要结束的线程，下一个线程运行的时候自动消除它
 		currentThread.status = statusFinished;// 当前线程状态置为完成
 
@@ -122,20 +120,20 @@ public class KThread {
 
 	private static void runNextThread() {// 执行下一个线程
 		KThread nextThread = readyQueue.nextThread();
-		
+
 		if (nextThread == null)
 			nextThread = idleThread;// 如果线程队列为空则执行idle线程
-		
+
 		nextThread.run();
 	}
 
 	private void run() {
 		Lib.assertTrue(Machine.interrupt().disabled());
-		
+
 		Machine.yield();// 当前java线程放弃CPU
 		currentThread.saveState();// 无实际操作
 		Lib.debug(dbgThread, "Switching from: " + currentThread.toString() + " to: " + toString());
-		
+
 		currentThread = this;
 		tcb.contextSwitch();
 		currentThread.restoreState();
@@ -145,12 +143,12 @@ public class KThread {
 	public static void yield() {// 运行线程放弃cpu，将当前线程放入就绪队列，读取就绪队列下一个线程运行
 		Lib.debug(dbgThread, "Yielding thread: " + currentThread.toString());
 		Lib.assertTrue(currentThread.status == statusRunning);
-		
+
 		boolean intStatus = Machine.interrupt().disable();
-		
+
 		currentThread.ready();// 正在执行的线程放入就绪队列，执行就绪队列的下一个线程
 		runNextThread();// 运行下一个线程
-		
+
 		Machine.interrupt().restore(intStatus);
 	}
 
@@ -169,10 +167,10 @@ public class KThread {
 	}
 
 	private static void createIdleThread() {
-		//the idleThread is used to yield() all the time,
-		//and make sure thar the readyQueue always has a KThread
+		// the idleThread is used to yield() all the time,
+		// and make sure thar the readyQueue always has a KThread
 		Lib.assertTrue(idleThread == null);
-		
+
 		idleThread = new KThread(new Runnable() {
 			public void run() {
 				while (true)
@@ -190,7 +188,7 @@ public class KThread {
 		Lib.assertTrue(Machine.interrupt().disabled());
 		Lib.assertTrue(this == currentThread);
 		Lib.assertTrue(tcb == TCB.currentTCB());
-		
+
 		Machine.autoGrader().runningThread(this);
 		status = statusRunning;
 		if (toBeDestroyed != null) {
@@ -200,7 +198,8 @@ public class KThread {
 		}
 	}
 
-	public void join() {// 线程B中有A.join()语句，则B等A执行完才能执行
+	public void join() {
+		// 线程B中有A.join()语句，则B等A执行完才能执行
 		Lib.debug(dbgThread, "Joining to thread: " + toString());
 		Lib.assertTrue(this != currentThread);
 		Lib.assertTrue(join_counter == 0);
@@ -240,16 +239,16 @@ public class KThread {
 
 		// new KThread(new PingTest(1)).setName("forked thread").fork();
 		// new PingTest(0).run();
-		// selfTest_join();
-		// selfTest_Condition2();
-		// selfTest_Alarm();
-		//selfTest_Communicator();
-		// selfTest_Boat();
-		// selftest_Scheduler();
-		 selftest_LotteryScheduler();
+		// joinTest();
+		// condition2Test();
+		// alarmTest();
+		// communicatorTest();
+		// boatTest();
+		// prioritySchduleTest();
+		selftest_LotteryScheduler();
 	}
 
-	public static void selfTest_join() {// 检测join是否工作正常
+	public static void joinTest() {// 检测join是否工作正常
 		Lib.debug(dbgThread, "Enter KThread.selfTest");
 		System.out.println("______join test begin_____");
 
@@ -267,7 +266,7 @@ public class KThread {
 
 	}
 
-	public static void selfTest_Condition2() {// 检测Condition2是否工作正常
+	public static void condition2Test() {// 检测Condition2是否工作正常
 		Lib.debug(dbgThread, "Enter KThread.selfTest");
 		System.out.println("______Condition2 test begin_____");
 		final Lock lock = new Lock();
@@ -276,7 +275,6 @@ public class KThread {
 		new KThread(new Runnable() {
 			public void run() {
 				lock.acquire();// 线程执行之前获得锁
-
 				KThread.currentThread().yield();
 				condition2.sleep();
 				System.out.println("thread1 executing");
@@ -304,7 +302,7 @@ public class KThread {
 
 	}
 
-	public static void selfTest_Alarm() {// 检测Alarm是否工作正常
+	public static void alarmTest() {// 检测Alarm是否工作正常
 
 		new KThread(new Runnable() {
 			public void run() {
@@ -319,7 +317,7 @@ public class KThread {
 
 	}
 
-	public static void selfTest_Communicator() {// 检测Communicator是否工作正常
+	public static void communicatorTest() {// 检测Communicator是否工作正常
 		Lib.debug(dbgThread, "Enter KThread.selfTest");
 		System.out.println("______Communicator test begin_____");
 		final Communicator communicator = new Communicator();
@@ -362,7 +360,7 @@ public class KThread {
 
 	}
 
-	public static void selfTest_Boat() {// 检测join是否工作正常
+	public static void boatTest() {// 检测join是否工作正常
 		Lib.debug(dbgThread, "Enter KThread.selfTest");
 		System.out.println("______Boat test begin_____");
 
@@ -376,50 +374,44 @@ public class KThread {
 
 	}
 
-	public static void selftest_Scheduler() {
+	public static void prioritySchduleTest() {
 
 		final KThread thread1 = new KThread(new Runnable() {
 			public void run() {
-
 				for (int i = 0; i < 3; i++) {
 					KThread.currentThread().yield();
 					System.out.println("thread1");
 				}
-
 			}
 		});
+
 		KThread thread2 = new KThread(new Runnable() {
 			public void run() {
-
 				for (int i = 0; i < 3; i++) {
 					KThread.currentThread().yield();
 					System.out.println("thread2");
 				}
-
 			}
 		});
+
 		KThread thread3 = new KThread(new Runnable() {
 			public void run() {
-
 				thread1.join();
-
 				for (int i = 0; i < 3; i++) {
 					KThread.currentThread().yield();
 					System.out.println("thread3");
 				}
 			}
 		});
+
 		boolean status = Machine.interrupt().disable();
+
 		ThreadedKernel.scheduler.setPriority(thread1, 2);
 		ThreadedKernel.scheduler.setPriority(thread2, 4);
 		ThreadedKernel.scheduler.setPriority(thread3, 6);
-		thread1.setName("thread111");
-
-		thread2.setName("thread2222");
-
-		thread3.setName("thread33333");
 
 		Machine.interrupt().restore(status);
+
 		thread1.fork();
 		thread2.fork();
 		thread3.fork();
@@ -427,44 +419,40 @@ public class KThread {
 	}
 
 	public static void selftest_LotteryScheduler() {
-		final KThread thread1 = new KThread(new Runnable() {
-			public void run() {
-				for (int i = 0; i < 3; i++) {
-					KThread.currentThread().yield();
-					System.out.println("thread1");
-				}
 
-			}
-		});
-		KThread thread2 = new KThread(new Runnable() {
+		final KThread threadA = new KThread(new Runnable() {
 			public void run() {
-				for (int i = 0; i < 3; i++) {
-					KThread.currentThread().yield();
-					System.out.println("thread2");
-				}
+				KThread.currentThread().yield();
+				System.out.println("Thread A get the lottery,16.7%");
 			}
 		});
-		KThread thread3 = new KThread(new Runnable() {
+
+		KThread threadB = new KThread(new Runnable() {
 			public void run() {
-				thread1.join();
-				for (int i = 0; i < 3; i++) {
-					KThread.currentThread().yield();
-					System.out.println("thread3");
-				}
+				KThread.currentThread().yield();
+				System.out.println("ThreadB get the lottery,33.3%");
 			}
 		});
-		
+
+		KThread threadC = new KThread(new Runnable() {
+			public void run() {
+				System.out.println("ThreadC got the lottery,66.7% ");
+				threadA.join();
+				System.out.println("ThreadC is Over");
+			}
+		});
+
 		boolean status = Machine.interrupt().disable();
-		
-		ThreadedKernel.scheduler.setPriority(thread1, 1);
-		ThreadedKernel.scheduler.setPriority(thread2, 2);
-		ThreadedKernel.scheduler.setPriority(thread3, 3);
-		
+
+		ThreadedKernel.scheduler.setPriority(threadA, 2);
+		ThreadedKernel.scheduler.setPriority(threadB, 4);
+		ThreadedKernel.scheduler.setPriority(threadC, 6);
+
 		Machine.interrupt().restore(status);
-		
-		thread1.fork();
-		thread2.fork();
-		thread3.fork();
+
+		threadA.fork();
+		threadB.fork();
+		threadC.fork();
 
 	}
 

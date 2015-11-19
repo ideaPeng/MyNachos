@@ -63,6 +63,7 @@ public class Coff {
 		} else {
 			byte[] headers = new byte[headerLength + aoutHeaderLength];
 
+			//以字节来判定file的length
 			if (file.length() < headers.length) {
 				Lib.debug(dbgCoff, "\tfile is not executable");
 				throw new EOFException();

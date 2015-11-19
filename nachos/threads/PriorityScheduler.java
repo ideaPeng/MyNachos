@@ -196,6 +196,7 @@ public class PriorityScheduler extends Scheduler {
 		public void setPriority(int priority) {// 优先级传递
 			if (this.priority == priority)
 				return;
+
 			this.priority = priority;
 
 			// implement me

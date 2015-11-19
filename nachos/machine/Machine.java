@@ -15,13 +15,13 @@ public final class Machine {
 
 	private static int numPhysPages = -1;
 	private static long randomSeed = 0;
-	
+
 	private static String autoGraderClassName = "nachos.ag.AutoGrader";
 	private static String shellProgramName = null;
 	private static String processClassName = null;
 	private static String configFileName = "nachos.conf";
 	private static String[] args = null;
-	
+
 	private static Interrupt interrupt = null;
 	private static Timer timer = null;
 	private static ElevatorBank bank = null;
@@ -34,8 +34,7 @@ public final class Machine {
 	private static Privilege privilege;
 	private static Stats stats = new Stats();
 	private static File baseDirectory, nachosDirectory, testDirectory;
-	
-	
+
 	/**
 	 * Nachos main entry point.
 	 *
@@ -43,24 +42,24 @@ public final class Machine {
 	 *            the command line arguments.
 	 */
 	public static void main(final String[] args) {
-		
 		System.out.print("STEP--> nachos 5.0j initializing...(In Machine.java)\n");
 		Lib.assertTrue(Machine.args == null);
-		
+
 		Machine.args = args;
 		processArgs();
 		Config.load(configFileName);
 
 		// get the current directory (.)
 		baseDirectory = new File(new File("").getAbsolutePath());
+		//System.out.println(baseDirectory.getAbsolutePath());
 		// get the nachos directory (./nachos)
 		nachosDirectory = new File(baseDirectory, "nachos");
 
 		String testDirectoryName = Config.getString("FileSystem.testDirectory");
-		//System.out.println(testDirectoryName);   --> null
+		// System.out.println(testDirectoryName); --> null
 
 		// get the test directory
-		//如果不使用自己的测试目录，则默认使用nachos.test目录
+		// 如果不使用自己的测试目录，则默认使用nachos.test目录
 		if (testDirectoryName != null) {
 			testDirectory = new File(testDirectoryName);
 		} else {
@@ -69,7 +68,7 @@ public final class Machine {
 		}
 
 		securityManager = new NachosSecurityManager(testDirectory);
-		
+
 		privilege = securityManager.getPrivilege();
 		privilege.machine = new MachinePrivilege();
 
@@ -77,7 +76,7 @@ public final class Machine {
 		privilege.stats = stats;
 
 		securityManager.enable();
-		
+
 		createDevices();
 		checkUserClasses();
 		autoGrader = (AutoGrader) Lib.constructObject(autoGraderClassName);

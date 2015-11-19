@@ -1,11 +1,14 @@
 #include "syscall.h"
 
 int main(){
+	
+	int a = 4;
+	int b = 3;
 
-	int a = 3;
-	int b = 4;
-	printf("a + b is %d\n",a+b);
+	int c = a+b;
 
+	printf("Now the child progress joined in\n");
+	printf("In child progress,the result is %d\n",c);
 
 	return 0;
 

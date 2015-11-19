@@ -57,7 +57,7 @@ public class UserProcess {
 	private Condition joinCondition = new Condition(joinLock);// join方法使用的条件变量
 
 	private static final char dbgProcess = 'a';
-	
+
 	/*
 	 * Allocate a new process.
 	 */
@@ -275,7 +275,8 @@ public class UserProcess {
 	 *         found. 从这个进程的虚拟内存中读一个null结尾的字符串。从特定的地址读最多 maxlength+1长度的字符。搜索null
 	 *         终止符，包括这个终止符把它转化为String类型，如果没有终止符，返回null
 	 */
-	public String readVirtualMemoryString(int vaddr, int maxLength) {// 从虚拟内存读字符串
+	public String readVirtualMemoryString(int vaddr, int maxLength) {
+		// 从虚拟内存读字符串
 		Lib.assertTrue(maxLength >= 0);
 
 		byte[] bytes = new byte[maxLength + 1];
@@ -300,7 +301,8 @@ public class UserProcess {
 	 *            the array where the data will be stored.
 	 * @return the number of bytes successfully transferred.
 	 */
-	public int readVirtualMemory(int vaddr, byte[] data) {// 将指定虚拟地址的数据从内存中读出，放入字符数组中
+	public int readVirtualMemory(int vaddr, byte[] data) {
+		// 将指定虚拟地址的数据从内存中读出，放入字符数组中
 		return readVirtualMemory(vaddr, data, 0, data.length);
 	}
 
@@ -565,7 +567,8 @@ public class UserProcess {
 		return 0;
 	}
 
-	private int handleHalt() {// 处理halt（）的系统调用，停止机器的操作，只有根进程可以调用
+	private int handleHalt() {
+		// 处理halt（）的系统调用，停止机器的操作，只有root进程可以调用
 		if (pid == 0)
 			Machine.halt();
 
@@ -573,8 +576,8 @@ public class UserProcess {
 		return 0;
 	}
 
-	private int handleExec(int fileAddress, int argc, int argvAddress) {// 处理Exec（）的系统调用，创建一个子进程，并执行
-
+	private int handleExec(int fileAddress, int argc, int argvAddress) {
+		// 处理Exec（）的系统调用，创建一个子进程，并执行
 		String filename = readVirtualMemoryString(fileAddress, 256);// 从内存中读出这个子进程使用的文件的名字
 
 		if (filename == null || argc < 0 || argvAddress < 0 || argvAddress > numPages * pageSize)
@@ -594,8 +597,8 @@ public class UserProcess {
 		return process.pid;
 	}
 
-	private int handleExit(int status) {// 处理exit（）的系统调用，退出
-										// 还没有写测试，而且返回状态没有给父进程用作join
+	private int handleExit(int status) {
+		// 处理exit（）的系统调用，退出
 		coff.close();// 关闭文件
 		for (int i = 0; i < 16; i++)// 关闭所有打开的文件
 		{
@@ -654,10 +657,11 @@ public class UserProcess {
 		return 0;
 	}
 
-	private int handleCreate(int fileAddress) {// 处理create（）的系统调用，创建一个文件，返回文件描述符
+	private int handleCreate(int fileAddress) {
+		// 处理create（）的系统调用，创建一个文件，返回文件描述符
 
 		String filename = readVirtualMemoryString(fileAddress, 256);
-		System.out.println("filename" + filename);
+		System.out.println("filename to be create -->" + filename);
 		if (filename == null)
 			return -1;// 文件名不存在,创建失败
 
@@ -667,7 +671,6 @@ public class UserProcess {
 			return -1;// 进程打开文件数已经达到上限，无法创建并打开
 		else {
 			openfiles[fileDescriptor] = ThreadedKernel.fileSystem.open(filename, true);// 文件不存在直接创建
-
 			return fileDescriptor;
 		}
 	}

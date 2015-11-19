@@ -152,8 +152,9 @@ public final class TCB {
 		 * make sure that the current thread is bound to the current TCB. This
 		 * check can only fail if non-Nachos threads invoke start().
 		 */
-		if (!isFirstTCB)
+		if (!isFirstTCB){
 			Lib.assertTrue(currentTCB.javaThread == Thread.currentThread());
+		}
 
 		/*
 		 * At this point all checks are complete, so we go ahead and start the
@@ -195,7 +196,7 @@ public final class TCB {
 		} else {
 			/*
 			 * This is the first TCB, so we don't need to make a new Java thread
-			 * to run it; we just steal the current Java thread.
+			 * to run it; we just steal the current Java thread  -->main
 			 */
 			javaThread = Thread.currentThread();//The java main thread
 

@@ -33,7 +33,7 @@ public class Lock {
 		Lib.assertTrue(!isHeldByCurrentThread());
 
 		boolean intStatus = Machine.interrupt().disable();
-		
+
 		KThread thread = KThread.currentThread();
 
 		if (lockHolder != null) {

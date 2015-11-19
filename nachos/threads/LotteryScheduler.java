@@ -2,6 +2,7 @@ package nachos.threads;
 
 import nachos.machine.*;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class LotteryScheduler extends Scheduler {
 
@@ -127,16 +128,15 @@ public class LotteryScheduler extends Scheduler {
 				return null;
 
 			int alltickets = 0;//彩票总数
-
+			
 			for (int i = 0; i < waitQueue.size(); i++)// 计算队列中所有彩票的总数
 			{
 				ThreadState thread = waitQueue.get(i);
-				alltickets += thread.getEffectivePriority();
-
+				alltickets  +=  thread.getEffectivePriority();
 			}
 
-			int numOfWin = Lib.random(alltickets + 1);// 产生中奖的数目
-
+			Random random = new Random();
+			int numOfWin = random.nextInt(alltickets + 1);// 产生中奖的彩票号
 			int nowtickets = 0;
 			KThread winThread = null;
 			ThreadState thread = null;
@@ -144,16 +144,18 @@ public class LotteryScheduler extends Scheduler {
 			for (int i = 0; i < waitQueue.size(); i++)// 得到获胜的线程
 			{
 				thread = waitQueue.get(i);
-				nowtickets += thread.getEffectivePriority();
+				//nowtickets += thread.getEffectivePriority();
+				nowtickets += thread.getPriority();
 				if (nowtickets >= numOfWin) {
 					winThread = thread.thread;
 					break;
 				}
 			}
 
-			if (winThread != null)
+			if (winThread != null){
 				waitQueue.remove(thread);
-
+			}
+			
 			return winThread;
 		}
 
@@ -197,7 +199,6 @@ public class LotteryScheduler extends Scheduler {
 		public int getEffectivePriority() {
 			// 得到有效优先级
 			// implement me
-
 			effectivepriority = priority;
 
 			for (int i = 0; i < waitQueue.waitQueue.size(); i++)

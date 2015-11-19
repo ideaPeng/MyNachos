@@ -43,7 +43,7 @@ public class AutoGrader {
 		kernel.initialize(args);
 
 		//begin the selfTest
-		run();
+		run();//when run is return , the whole nachos is terminate();
 	}
 
 	private void extractArguments(String[] args) {

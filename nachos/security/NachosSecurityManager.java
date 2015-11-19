@@ -65,6 +65,7 @@ public class NachosSecurityManager extends SecurityManager {
 	}
 
 	private class PrivilegeProvider extends Privilege {
+		
 		public void doPrivileged(Runnable action) {
 			NachosSecurityManager.this.doPrivileged(action);
 		}
